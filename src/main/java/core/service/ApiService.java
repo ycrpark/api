@@ -50,6 +50,19 @@ public class ApiService {
 		return Loader.INSTANCE;
 	}
 
+	/**
+	 * restTemplate 사용
+	 * 
+	 * @param <T1> request body object
+	 * @param <T2> response object
+	 * @param url
+	 * @param httpMethod
+	 * @param headers
+	 * @param apiRq
+	 * @param responseClass
+	 * @param timeout
+	 * @return
+	 */
 	public <T1, T2> T2 sendApi(String url, HttpMethod httpMethod, HttpHeaders headers, T1 apiRq, Class<T2> responseClass, Integer timeout) {
 		int readTimeOut;
 		int connTimeOut;
@@ -91,10 +104,19 @@ public class ApiService {
 		return apiRs;
 	}
 	
+	/**
+	 * pooling api
+	 * 
+	 * @param <T> response object
+	 * @param request
+	 * @param responseClass
+	 * @param timeout
+	 * @return
+	 */
 	@SuppressWarnings("unchecked")
 	public <T> T sendApi(HttpUriRequest request, Class<T> responseClass, int timeout) {
 		CloseableHttpClient httpClient = null;
-		if(timeout == -1) {
+		if(timeout <= 0) {
 			httpClient = defaultHttpClient;
 		} else {
 			RequestConfig config = RequestConfig.custom()
@@ -130,11 +152,11 @@ public class ApiService {
 	}
 	
 	public <T> T sendApi(HttpUriRequest request, Class<T> responseClass) {
-		return sendApi(request, responseClass, -1);
+		return sendApi(request, responseClass, 0);
 	}
 	
 	public <T> T sendApi(HttpUriRequest request) {
-		return sendApi(request, null, -1);
+		return sendApi(request, null, 0);
 	}
 	
 }
