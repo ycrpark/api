@@ -142,6 +142,49 @@ public class ApiService {
 	}
 	
 	/**
+	 * RestTemplate 사용 API 호출
+	 * 성공 시에만 응답, 실패시 null
+	 * 
+	 * POST, PUT 등 body있는 api발송
+	 * 
+	 * @param <T1> request body object
+	 * @param <T2> response object
+	 * @param apiInfo 발송 정보
+	 * @param httpMethod
+	 * @param headers
+	 * @param apiRq
+	 * @param responseClass
+	 * @return
+	 */
+	public <T1, T2> T2 sendApiAndGetSuccRs(ApiInfo apiInfo, HttpMethod httpMethod, HttpHeaders headers, T1 apiRq, Class<T2> responseClass) {
+		ApiRsInfo<T2> apiRsInfo = sendApi(apiInfo, httpMethod, headers, apiRq, responseClass);
+		
+		if(apiRsInfo != null && apiRsInfo.isSuccExecuteApi()) {
+			return apiRsInfo.getResponse();
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * RestTemplate 사용 API 호출
+	 * 성공 시에만 응답, 실패시 null
+	 * 
+	 * GET, DELETE 등 body없는 api발송
+	 * 
+	 * @param <T1> request body object
+	 * @param <T2> response object
+	 * @param apiInfo 발송 정보
+	 * @param httpMethod
+	 * @param headers
+	 * @param responseClass
+	 * @return
+	 */
+	public <T> T sendApiAndGetSuccRs(ApiInfo apiInfo, HttpMethod httpMethod, HttpHeaders headers, Class<T> responseClass) {
+		return sendApiAndGetSuccRs(apiInfo, httpMethod, headers, null, responseClass);
+	}
+	
+	/**
 	 * 알리미, 로그 저장 등
 	 * 
 	 * @param apiRq rq오브젝트 or String
@@ -151,60 +194,6 @@ public class ApiService {
 		if(e != null || apiInfo.isSaveApiLog()) {
 			
 		}
-	}
-	
-	/**
-	 * restTemplate 사용
-	 * 
-	 * @param <T1> request body object
-	 * @param <T2> response object
-	 * @param url
-	 * @param httpMethod
-	 * @param headers
-	 * @param apiRq
-	 * @param responseClass
-	 * @param timeout
-	 * @return
-	 */
-	public <T1, T2> T2 sendApi(String url, HttpMethod httpMethod, HttpHeaders headers, T1 apiRq, Class<T2> responseClass, Integer timeout) {
-		int readTimeOut;
-		int connTimeOut;
-		if(timeout == null) {
-			readTimeOut = DEFAULT_TIME_OUT;
-			connTimeOut = DEFAULT_TIME_OUT;
-		} else {
-			readTimeOut = timeout;
-			connTimeOut = timeout;
-		}
-		
-		if(headers == null) {
-			headers = new HttpHeaders();
-		}
-
-		HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
-		requestFactory.setReadTimeout(readTimeOut);
-		requestFactory.setConnectTimeout(connTimeOut);
-
-		RestTemplate restTemplate = new RestTemplate(requestFactory);
-		HttpEntity<?> entity = null;
-		if(apiRq == null) {
-			entity = new HttpEntity<String>(headers);
-		} else {
-			entity = new HttpEntity<T1>(apiRq, headers);
-		}
-
-		long startTime = System.currentTimeMillis();
-
-		T2 apiRs = null;
-		try {
-			apiRs = restTemplate.exchange(url, httpMethod, entity, responseClass).getBody();
-		} catch (Exception e) {
-			log.error("sendApi error : {}", e);
-		} finally {
-			log.warn("sendApi time : {}", System.currentTimeMillis() - startTime);
-		}
-
-		return apiRs;
 	}
 	
 }
