@@ -1,7 +1,6 @@
 # api
 API 호출 서비스
 
-# main/java/core/service/
 # ApiService
 RestTemplate 사용 API 호출
 
