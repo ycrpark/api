@@ -1,4 +1,4 @@
-# api manager
+# rest api manager
 - API 호출
 - RestTemplate
 - HttpUriRequest, PoolingHttpClientConnectionManager
